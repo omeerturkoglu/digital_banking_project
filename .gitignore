@@ -1,0 +1,25 @@
+# Node & Angular
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+
+# .NET Core
+backend/bin/
+backend/obj/
+backend/appsettings.Development.json
+backend/appsettings.user.json
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docker / Environment
+.env
