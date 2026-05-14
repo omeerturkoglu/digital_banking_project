@@ -24,7 +24,10 @@
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Dijital Şifre</label>
+        <div class="flex justify-between items-end mb-2">
+          <label class="block text-xs font-bold text-gray-400 uppercase">Dijital Şifre</label>
+          <a routerLink="/forgot-password" class="text-xs text-brand-primary hover:text-emerald-400 transition-colors cursor-pointer font-semibold">Şifremi Unuttum</a>
+        </div>
         <input type="password" value="********" disabled class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed opacity-70">
       </div>
 
@@ -43,7 +46,7 @@
       </div>
 
       <button (click)="onLogin()" class="w-full mt-6 bg-brand-primary hover:bg-emerald-400 text-brand-dark font-extrabold py-4 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] flex justify-center items-center gap-2">
-        <span>Yetkili Girişi Yap</span>
+        <span>Giriş Yap</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
       </button>
 

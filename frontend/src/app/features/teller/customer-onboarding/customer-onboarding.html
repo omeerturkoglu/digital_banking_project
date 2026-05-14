@@ -26,7 +26,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div class="col-span-1 md:col-span-2">
             <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">T.C. Kimlik Numarası *</label>
-            <input type="text" [(ngModel)]="customer.tckn" name="tckn" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="11 Haneli TCKN">
+            <input type="text" [(ngModel)]="customer.tckn" name="tckn" (input)="onTcInput($event)" maxlength="11" class="w-full bg-brand-dark border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors" [ngClass]="customer.tckn.length > 0 && !isTcNoValid ? 'border-red-500 focus:border-red-500' : 'border-gray-700 focus:border-brand-primary'" placeholder="11 Haneli TCKN">
+            <p *ngIf="customer.tckn.length > 0 && !isTcNoValid" class="text-red-500 text-[10px] mt-1.5 ml-1 font-bold">Lütfen 11 haneli geçerli bir T.C. Kimlik No girin.</p>
           </div>
 
           <div>
@@ -40,16 +41,18 @@
 
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Cep Telefonu *</label>
-            <input type="tel" [(ngModel)]="customer.phone" name="phone" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="05XX XXX XX XX">
+            <input type="tel" [(ngModel)]="customer.phone" name="phone" (input)="onPhoneInput($event)" maxlength="11" class="w-full bg-brand-dark border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors" [ngClass]="customer.phone.length > 0 && !isPhoneValid ? 'border-red-500 focus:border-red-500' : 'border-gray-700 focus:border-brand-primary'" placeholder="05XX XXX XX XX">
+            <p *ngIf="customer.phone.length > 0 && !isPhoneValid" class="text-red-500 text-[10px] mt-1.5 ml-1 font-bold">Geçerli bir telefon girin (örn: 05551234567).</p>
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">E-Posta Adresi</label>
-            <input type="email" [(ngModel)]="customer.email" name="email" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="ornek@posta.com">
+            <input type="email" [(ngModel)]="customer.email" name="email" class="w-full bg-brand-dark border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors" [ngClass]="customer.email.length > 0 && !isEmailValid ? 'border-red-500 focus:border-red-500' : 'border-gray-700 focus:border-brand-primary'" placeholder="ornek@posta.com">
+            <p *ngIf="customer.email.length > 0 && !isEmailValid" class="text-red-500 text-[10px] mt-1.5 ml-1 font-bold">Lütfen geçerli bir e-posta adresi girin.</p>
           </div>
         </div>
 
         <div class="mt-8 flex justify-end">
-          <button type="button" (click)="registerCustomer()" [disabled]="isSubmitting" class="bg-emerald-500 hover:bg-emerald-400 text-brand-dark font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2">
+          <button type="button" (click)="registerCustomer()" [disabled]="isSubmitting || !isFormValid" class="bg-emerald-500 hover:bg-emerald-400 text-brand-dark font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none">
             <span *ngIf="!isSubmitting">Kaydı Tamamla & Hesap Aç</span>
             <span *ngIf="isSubmitting" class="animate-pulse">Sistemle Senkronize Ediliyor...</span>
             <svg *ngIf="!isSubmitting" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>

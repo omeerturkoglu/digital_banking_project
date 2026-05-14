@@ -19,7 +19,7 @@ export class App {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         // Eğer link '/login' ise veya ana dizin '/' ise menüyü SAKLA (false)
-        this.showLayout = !(event.url === '/login' || event.url === '/');
+        this.showLayout = !(event.url === '/login' || event.url === '/' || event.url === '/forgot-password');
       }
     });
   }

@@ -74,4 +74,34 @@ export class Reports {
     tx.category = newCategory;
     alert(`[Sistem Mesajı] ${tx.merchant} işlemi '${newCategory}' olarak güncellendi.`);
   }
+
+  // Bütçe Formu Modal State ve Metotları
+  isBudgetModalOpen = false;
+  editingBudget: any = null;
+
+  openBudgetModal(budget?: any) {
+    if (budget) {
+      this.editingBudget = { ...budget };
+    } else {
+      this.editingBudget = { category: '', limit: 0, spent: 0, color: 'bg-emerald-500' };
+    }
+    this.isBudgetModalOpen = true;
+  }
+
+  closeBudgetModal() {
+    this.isBudgetModalOpen = false;
+    this.editingBudget = null;
+  }
+
+  saveBudget() {
+    if (!this.editingBudget.category || this.editingBudget.limit <= 0) return;
+    
+    const existingIndex = this.budgets.findIndex(b => b.category === this.editingBudget.category);
+    if (existingIndex !== -1) {
+      this.budgets[existingIndex].limit = this.editingBudget.limit;
+    } else {
+      this.budgets.push({ ...this.editingBudget });
+    }
+    this.closeBudgetModal();
+  }
 }

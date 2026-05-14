@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // Input okumak için ekledik
 
@@ -21,6 +21,8 @@ export class Accounts {
   selectedCurrency: string = 'USD'; // USD, EUR, GBP
   isCreating: boolean = false;
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   // Yeni Hesap Oluşturma Fonksiyonu
   openNewAccount() {
     this.isCreating = true;
@@ -39,6 +41,7 @@ export class Accounts {
         const symbol = this.selectedCurrency === 'USD' ? '$' : (this.selectedCurrency === 'EUR' ? '€' : '£');
         this.myAccounts.push({ id: newId, type: `Vadesiz Döviz (${this.selectedCurrency})`, iban: randomIban, balance: 0, currency: symbol, bg: 'from-blue-500/20 to-brand-dark' });
       }
+      this.cdr.detectChanges();
     }, 800);
   }
 }

@@ -1,0 +1,87 @@
+<div class="space-y-6">
+  
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h2 class="text-3xl font-bold text-white tracking-tight">Müşteri Özet Raporu</h2>
+      <p class="text-gray-400 text-sm mt-1">Şubenize kayıtlı müşterilerin finansal durumu ve istatistikleri.</p>
+    </div>
+    <button class="bg-blue-500/20 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-500 hover:text-white transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+      Detaylı Rapor İndir
+    </button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="backdrop-blur-xl bg-white/5 p-6 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden group">
+      <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
+      <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 relative z-10">Toplam Müşteri</p>
+      <h3 class="text-3xl font-extrabold text-white relative z-10">{{ branchStats.totalCustomers }}</h3>
+      <p class="text-xs text-blue-400 mt-2 font-semibold relative z-10">+{{ branchStats.newCustomersThisMonth }} bu ay yeni kayıt</p>
+    </div>
+
+    <div class="backdrop-blur-xl bg-white/5 p-6 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden group">
+      <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
+      <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 relative z-10">Şube Toplam Varlık</p>
+      <h3 class="text-3xl font-extrabold text-white relative z-10">₺45.000.000</h3>
+      <p class="text-xs text-emerald-400 mt-2 font-semibold relative z-10">%4.2 artış (Aylık)</p>
+    </div>
+
+    <div class="backdrop-blur-xl bg-white/5 p-6 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden group">
+      <div class="absolute -right-10 -top-10 w-32 h-32 bg-brand-accent/10 rounded-full blur-2xl group-hover:bg-brand-accent/20 transition-all"></div>
+      <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 relative z-10">Kredi / Mevduat Oranı</p>
+      <h3 class="text-3xl font-extrabold text-white relative z-10">0.85</h3>
+      <p class="text-xs text-brand-accent mt-2 font-semibold relative z-10">Risk seviyesi normal</p>
+    </div>
+  </div>
+
+  <!-- Customer Table -->
+  <div class="backdrop-blur-xl bg-white/5 rounded-3xl border border-white/10 shadow-2xl overflow-hidden mt-8">
+    <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-white/5">
+      <h3 class="text-lg font-bold text-white">En Yüksek Hacimli Müşteriler</h3>
+      <div class="relative">
+        <input type="text" placeholder="Müşteri Ara..." class="bg-brand-dark border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500 w-64">
+      </div>
+    </div>
+    
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-900/50 text-gray-400 text-xs uppercase tracking-wider">
+            <th class="p-4 font-semibold">Müşteri No</th>
+            <th class="p-4 font-semibold">Ad Soyad / Unvan</th>
+            <th class="p-4 font-semibold">Tip</th>
+            <th class="p-4 font-semibold text-right">Toplam Varlık</th>
+            <th class="p-4 font-semibold text-center">Durum</th>
+            <th class="p-4 font-semibold">İşlem</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800">
+          <tr *ngFor="let customer of customers" class="hover:bg-white/5 transition-colors">
+            <td class="p-4 text-sm text-gray-400 font-mono">{{ customer.id }}</td>
+            <td class="p-4 text-sm font-bold text-white">{{ customer.name }}</td>
+            <td class="p-4">
+              <span class="px-2 py-1 text-[10px] uppercase font-bold rounded-md" 
+                    [class.bg-purple-500/20]="customer.type === 'Kurumsal'" [class.text-purple-400]="customer.type === 'Kurumsal'"
+                    [class.bg-gray-700]="customer.type === 'Bireysel'" [class.text-gray-300]="customer.type === 'Bireysel'">
+                {{ customer.type }}
+              </span>
+            </td>
+            <td class="p-4 text-sm text-white font-bold text-right">₺{{ customer.totalAssets | number:'1.2-2' }}</td>
+            <td class="p-4 text-center">
+              <span class="px-2 py-1 text-[10px] uppercase font-bold rounded-md"
+                    [class.bg-emerald-500/20]="customer.status === 'VIP'" [class.text-emerald-400]="customer.status === 'VIP'"
+                    [class.bg-blue-500/20]="customer.status === 'Aktif'" [class.text-blue-400]="customer.status === 'Aktif'"
+                    [class.bg-red-500/20]="customer.status === 'Pasif'" [class.text-red-400]="customer.status === 'Pasif'">
+                {{ customer.status }}
+              </span>
+            </td>
+            <td class="p-4">
+              <button class="text-blue-400 hover:text-blue-300 text-xs font-bold transition-colors">Profili İncele</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
