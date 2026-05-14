@@ -1,0 +1,78 @@
+<div class="space-y-6">
+  
+  <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+    <div>
+      <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+        <div class="p-2 bg-purple-500/20 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+        </div>
+        Hesaplarım ve Varlıklarım
+      </h2>
+      <p class="text-gray-400 text-sm mt-1">Vadesiz TL ve döviz hesaplarınızı yönetin, yeni hesap açın.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <div class="lg:col-span-1 bg-white/5 border border-white/10 rounded-3xl p-6 shadow-xl h-fit sticky top-8">
+      <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">Yeni Hesap Aç</h3>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Hesap Türü</label>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="accType" [(ngModel)]="newAccountType" value="TL" class="text-brand-primary bg-brand-dark border-gray-700 focus:ring-brand-primary">
+              <span class="text-white text-sm">Vadesiz TL</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="accType" [(ngModel)]="newAccountType" value="DOVIZ" class="text-brand-primary bg-brand-dark border-gray-700 focus:ring-brand-primary">
+              <span class="text-white text-sm">Vadesiz Döviz</span>
+            </label>
+          </div>
+        </div>
+
+        <div *ngIf="newAccountType === 'DOVIZ'" class="animate-fade-in transition-all">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Döviz Cinsi</label>
+          <select [(ngModel)]="selectedCurrency" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors cursor-pointer">
+            <option value="USD">Amerikan Doları (USD)</option>
+            <option value="EUR">Euro (EUR)</option>
+            <option value="GBP">İngiliz Sterlini (GBP)</option>
+          </select>
+        </div>
+
+        <button (click)="openNewAccount()" [disabled]="isCreating" class="w-full mt-4 bg-gradient-to-r from-brand-primary to-emerald-400 hover:from-emerald-400 hover:to-brand-primary text-brand-dark font-extrabold py-3 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] flex justify-center items-center gap-2">
+          <span *ngIf="!isCreating">Hesabı Oluştur</span>
+          <span *ngIf="isCreating" class="animate-pulse">Açılıyor...</span>
+          <svg *ngIf="!isCreating" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="lg:col-span-2 space-y-4">
+      <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">Aktif Hesaplarınız</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div *ngFor="let acc of myAccounts" class="bg-gradient-to-br border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-white/30 transition-all" [ngClass]="acc.bg">
+          
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white backdrop-blur-sm shadow-inner">
+              <span class="font-bold text-lg">{{acc.currency}}</span>
+            </div>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg border border-emerald-500/20">Aktif</span>
+          </div>
+          
+          <p class="text-gray-400 text-xs uppercase tracking-wider mb-1">{{acc.type}}</p>
+          <h4 class="text-3xl font-extrabold text-white mb-6">{{acc.balance | number:'1.2-2'}} <span class="text-sm font-medium">{{acc.currency}}</span></h4>
+          
+          <div class="bg-black/30 rounded-lg p-3 backdrop-blur-sm border border-white/5">
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">IBAN</p>
+            <p class="font-mono text-sm text-gray-200 tracking-wider">{{acc.iban}}</p>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

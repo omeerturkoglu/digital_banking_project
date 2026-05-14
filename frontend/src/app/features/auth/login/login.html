@@ -1,0 +1,52 @@
+<div class="min-h-screen bg-brand-dark flex items-center justify-center p-4">
+  
+  <div class="max-w-md w-full bg-brand-light border border-gray-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+    
+    <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand-primary/20 blur-3xl rounded-full pointer-events-none"></div>
+
+    <div class="flex items-center justify-center gap-3 mb-8 relative z-10">
+      <div class="w-12 h-12 rounded-xl bg-brand-primary flex items-center justify-center shadow-lg shadow-brand-primary/20">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <span class="text-3xl font-bold text-white tracking-wide">NOVA<span class="text-brand-primary">FINANS</span></span>
+    </div>
+
+    <h2 class="text-2xl font-bold text-white text-center mb-2">Sisteme Giriş</h2>
+    <p class="text-gray-400 text-center text-sm mb-8">Lütfen test ortamı için bir rol seçerek ilerleyin.</p>
+
+    <div class="space-y-5">
+      
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">T.C. Kimlik Numarası</label>
+        <input type="text" value="12345678901" disabled class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-gray-500 font-mono cursor-not-allowed opacity-70">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Dijital Şifre</label>
+        <input type="password" value="********" disabled class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed opacity-70">
+      </div>
+
+      <div class="bg-brand-primary/5 border border-brand-primary/20 p-4 rounded-xl mt-6">
+        <label class="block text-xs font-bold text-brand-primary uppercase mb-3 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>
+          Giriş Yapılacak Rolü Belirleyin
+        </label>
+        
+        <select [(ngModel)]="selectedRole" name="role" class="w-full bg-brand-dark border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors cursor-pointer font-medium appearance-none hover:border-gray-500">
+          <option value="Müşteri (Kişisel Finans)">👤 Müşteri (Kişisel Finans)</option>
+          <option value="Sistem Yöneticisi (Admin)">🛡️ Sistem Yöneticisi (Admin)</option>
+          <option value="Şube Müdürü">📊 Şube Müdürü</option>
+          <option value="Gişe Memuru">💶 Gişe Memuru</option>
+        </select>
+      </div>
+
+      <button (click)="onLogin()" class="w-full mt-6 bg-brand-primary hover:bg-emerald-400 text-brand-dark font-extrabold py-4 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] flex justify-center items-center gap-2">
+        <span>Yetkili Girişi Yap</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+      </button>
+
+    </div>
+  </div>
+</div>

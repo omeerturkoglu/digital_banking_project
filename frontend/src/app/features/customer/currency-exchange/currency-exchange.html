@@ -1,0 +1,117 @@
+<div class="space-y-6">
+  
+  <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+    <div>
+      <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+        <div class="p-2 bg-yellow-500/20 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+        </div>
+        Piyasalar ve Döviz İşlemleri
+      </h2>
+      <p class="text-gray-400 text-sm mt-1">Canlı piyasa verileri ile 7/24 döviz ve altın alım/satım işlemleri.</p>
+    </div>
+    <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+      <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
+      <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Piyasa Açık</span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <div class="lg:col-span-2 space-y-4">
+      <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Canlı Döviz Kurları</h3>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div *ngFor="let rate of marketRates" 
+             (click)="selectedCurrency = rate"
+             [class.border-yellow-500]="selectedCurrency.code === rate.code"
+             [class.bg-yellow-500]="selectedCurrency.code === rate.code"
+             [class.bg-opacity-10]="selectedCurrency.code === rate.code"
+             class="bg-white/5 border border-white/10 rounded-2xl p-5 cursor-pointer hover:bg-white/10 transition-colors relative overflow-hidden group">
+          
+          <div class="flex justify-between items-start mb-2">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center font-bold text-gray-300 border border-gray-700">
+                {{rate.code.charAt(0)}}
+              </div>
+              <div>
+                <p class="text-white font-bold">{{rate.code}}</p>
+                <p class="text-xs text-gray-500">{{rate.name}}</p>
+              </div>
+            </div>
+            <div [class.text-emerald-400]="rate.trend === 'up'" [class.text-red-400]="rate.trend === 'down'">
+              <svg *ngIf="rate.trend === 'up'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" /></svg>
+              <svg *ngIf="rate.trend === 'down'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd" /></svg>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mt-4">
+            <div class="bg-brand-dark/50 rounded-lg p-2 text-center border border-gray-800">
+              <p class="text-[10px] text-gray-500 uppercase">Alış</p>
+              <p class="text-sm font-mono font-bold" [class.text-emerald-400]="rate.trend === 'up'" [class.text-red-400]="rate.trend === 'down'">{{rate.buy}} ₺</p>
+            </div>
+            <div class="bg-brand-dark/50 rounded-lg p-2 text-center border border-gray-800">
+              <p class="text-[10px] text-gray-500 uppercase">Satış</p>
+              <p class="text-sm font-mono font-bold text-gray-300">{{rate.sell}} ₺</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-1">
+      <div class="bg-gradient-to-b from-brand-light to-brand-dark border border-gray-700 rounded-3xl p-6 shadow-2xl sticky top-8">
+        
+        <h3 class="text-center text-white font-bold text-lg mb-6 border-b border-gray-700 pb-4">İşlem Paneli ({{selectedCurrency.code}})</h3>
+
+        <div class="flex justify-between items-center bg-gray-900/50 p-3 rounded-xl border border-gray-800 mb-6">
+          <div class="text-center flex-1 border-r border-gray-700">
+            <p class="text-[10px] text-gray-500 uppercase">Kullanılabilir TL</p>
+            <p class="text-sm font-bold text-white">₺{{myAccounts.TRY | number:'1.2-2'}}</p>
+          </div>
+          <div class="text-center flex-1">
+            <p class="text-[10px] text-gray-500 uppercase">Kullanılabilir {{selectedCurrency.code}}</p>
+            <p class="text-sm font-bold text-emerald-400">{{selectedCurrency.code === 'USD' ? myAccounts.USD : (selectedCurrency.code === 'EUR' ? myAccounts.EUR : 0) | number:'1.2-2'}}</p>
+          </div>
+        </div>
+
+        <div class="space-y-5">
+          <div class="flex bg-gray-900 rounded-lg p-1 border border-gray-800">
+            <button (click)="transactionType = 'BUY'" [class.bg-emerald-500]="transactionType === 'BUY'" [class.text-brand-dark]="transactionType === 'BUY'" [class.text-gray-400]="transactionType !== 'BUY'" class="flex-1 py-2 text-sm font-bold rounded-md transition-colors">
+              AL
+            </button>
+            <button (click)="transactionType = 'SELL'" [class.bg-red-500]="transactionType === 'SELL'" [class.text-white]="transactionType === 'SELL'" [class.text-gray-400]="transactionType !== 'SELL'" class="flex-1 py-2 text-sm font-bold rounded-md transition-colors">
+              SAT
+            </button>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Miktar ({{selectedCurrency.code}})</label>
+            <div class="relative">
+              <input type="number" [(ngModel)]="amount" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white text-xl font-bold focus:outline-none focus:border-yellow-500 transition-colors text-center" placeholder="0">
+            </div>
+          </div>
+
+          <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 text-center mt-4">
+            <p class="text-xs text-yellow-500/80 mb-1">
+              Geçerli Kur: <span class="font-bold text-yellow-400">{{transactionType === 'BUY' ? selectedCurrency.sell : selectedCurrency.buy}} ₺</span>
+            </p>
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-3">Toplam İşlem Tutarı</p>
+            <p class="text-2xl font-extrabold text-white">₺{{calculatedTotal | number:'1.2-2'}}</p>
+          </div>
+
+          <button (click)="executeTrade()" [disabled]="isProcessing" 
+                  [class.bg-emerald-500]="transactionType === 'BUY'" [class.hover:bg-emerald-400]="transactionType === 'BUY'"
+                  [class.bg-red-500]="transactionType === 'SELL'" [class.hover:bg-red-400]="transactionType === 'SELL'"
+                  class="w-full text-white font-extrabold py-4 px-4 rounded-xl transition-all flex justify-center items-center gap-2 mt-4 shadow-lg">
+            <span *ngIf="!isProcessing">{{transactionType === 'BUY' ? selectedCurrency.code + ' AL' : selectedCurrency.code + ' SAT'}}</span>
+            <span *ngIf="isProcessing" class="animate-pulse">İşlem Onaylanıyor...</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

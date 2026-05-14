@@ -1,0 +1,92 @@
+<div class="space-y-6">
+  
+  <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+    <div>
+      <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+        <div class="p-2 bg-emerald-500/20 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+        </div>
+        Yeni Müşteri Kaydı (Onboarding)
+      </h2>
+      <p class="text-gray-400 text-sm mt-1">Sisteme yeni müşteri ekleme, otomatik hesap açılışı ve SMS ile şifre iletimi.</p>
+    </div>
+  </div>
+
+  <div *ngIf="successMessage" class="bg-emerald-500/10 border border-emerald-500/50 text-emerald-400 p-4 rounded-xl flex items-center gap-3 animate-pulse">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <p class="font-semibold">{{successMessage}}</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
+    
+    <div class="lg:col-span-2 bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+      <h3 class="text-xl font-bold text-white mb-6 border-b border-gray-800 pb-2">Kimlik ve İletişim Bilgileri</h3>
+      
+      <form class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="col-span-1 md:col-span-2">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">T.C. Kimlik Numarası *</label>
+            <input type="text" [(ngModel)]="customer.tckn" name="tckn" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="11 Haneli TCKN">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Ad *</label>
+            <input type="text" [(ngModel)]="customer.firstName" name="firstName" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="Müşterinin Adı">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Soyad *</label>
+            <input type="text" [(ngModel)]="customer.lastName" name="lastName" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="Müşterinin Soyadı">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Cep Telefonu *</label>
+            <input type="tel" [(ngModel)]="customer.phone" name="phone" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="05XX XXX XX XX">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">E-Posta Adresi</label>
+            <input type="email" [(ngModel)]="customer.email" name="email" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="ornek@posta.com">
+          </div>
+        </div>
+
+        <div class="mt-8 flex justify-end">
+          <button type="button" (click)="registerCustomer()" [disabled]="isSubmitting" class="bg-emerald-500 hover:bg-emerald-400 text-brand-dark font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2">
+            <span *ngIf="!isSubmitting">Kaydı Tamamla & Hesap Aç</span>
+            <span *ngIf="isSubmitting" class="animate-pulse">Sistemle Senkronize Ediliyor...</span>
+            <svg *ngIf="!isSubmitting" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="lg:col-span-1 flex flex-col items-center justify-start mt-4 lg:mt-0">
+      <p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-4 w-full text-left pl-2">Canlı Dijital Profil</p>
+      
+      <div class="w-full h-56 bg-gradient-to-tr from-gray-800 to-gray-600 rounded-2xl p-6 shadow-2xl relative overflow-hidden border border-gray-500">
+        <div class="flex justify-between items-start">
+          <div class="w-12 h-10 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded opacity-80"></div>
+          <span class="text-lg font-bold text-white opacity-50 italic tracking-widest">NOVA</span>
+        </div>
+        
+        <div class="absolute bottom-6 left-6 text-white w-full pr-12">
+          <p class="font-mono text-xl tracking-widest opacity-80 mb-2">TR12 0006 **** ****</p>
+          <div class="flex justify-between items-center w-full">
+            <p class="font-bold uppercase truncate">
+              {{ customer.firstName || 'MÜŞTERİ' }} {{ customer.lastName || 'ADI' }}
+            </p>
+            <p class="font-mono text-sm opacity-80 pr-10">05/30</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full bg-brand-primary/10 border border-brand-primary/20 rounded-xl p-4 mt-6">
+        <p class="text-xs text-brand-primary font-bold mb-1 flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Sistem Bilgisi
+        </p>
+        <p class="text-gray-400 text-xs leading-relaxed">Kayıt onaylandığı an arka planda Vadesiz TL hesabı üretilecek ve dijital giriş şifresi müşterinin beyan ettiği cep telefonuna ({{customer.phone || '---'}}) şifrelenmiş SMS olarak iletilecektir.</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
