@@ -13,10 +13,10 @@
 -- 1. KULLANICILAR (4 rol, 4 kullanıcı)
 -- =====================================================
 INSERT INTO users (tckn, first_name, last_name, email, phone, password_hash, role_code) VALUES
-('12345678901', 'S. Koray',   'Ölmez',     'koray@novabank.com',   '05301234567', '$2a$12$LJ3m4ys3Grx/dGE.UWoJeOQFjmBMGrOMIk3gB/UhTVd0Jy1fHpGKy', 'CUSTOMER'),
-('98765432101', 'İbrahim Emir','Çınkır',   'emir@novabank.com',    '05319876543', '$2a$12$LJ3m4ys3Grx/dGE.UWoJeOQFjmBMGrOMIk3gB/UhTVd0Jy1fHpGKy', 'ADMIN'),
-('11223344556', 'Ömer',       'Türkoğlu',  'omer@novabank.com',    '05325551234', '$2a$12$LJ3m4ys3Grx/dGE.UWoJeOQFjmBMGrOMIk3gB/UhTVd0Jy1fHpGKy', 'MANAGER'),
-('55443322110', 'Ayşe',       'Yıldız',    'ayse@novabank.com',    '05337778899', '$2a$12$LJ3m4ys3Grx/dGE.UWoJeOQFjmBMGrOMIk3gB/UhTVd0Jy1fHpGKy', 'TELLER');
+('12345678901', 'S. Koray',   'Ölmez',     'koray@novabank.com',   '05301234567', '$2a$11$tmiRdW3NORNFw.8DWIMQ/.eJe8kVR8z6Ho2n3.IpIVWfGccaM1qZ.', 'CUSTOMER'),
+('98765432101', 'İbrahim Emir','Çınkır',   'emir@novabank.com',    '05319876543', '$2a$11$tmiRdW3NORNFw.8DWIMQ/.eJe8kVR8z6Ho2n3.IpIVWfGccaM1qZ.', 'ADMIN'),
+('11223344556', 'Ömer',       'Türkoğlu',  'omer@novabank.com',    '05325551234', '$2a$11$tmiRdW3NORNFw.8DWIMQ/.eJe8kVR8z6Ho2n3.IpIVWfGccaM1qZ.', 'MANAGER'),
+('55443322110', 'Ayşe',       'Yıldız',    'ayse@novabank.com',    '05337778899', '$2a$11$tmiRdW3NORNFw.8DWIMQ/.eJe8kVR8z6Ho2n3.IpIVWfGccaM1qZ.', 'TELLER');
 
 -- =====================================================
 -- 2. BANKA HESAPLARI
@@ -30,6 +30,24 @@ INSERT INTO accounts (user_id, account_type, currency, iban, balance) VALUES
 (1, 'VADESIZ_DOVIZ', 'EUR', 'TR120006100099990000110004', 0.00),
 -- Ömer (Müdür) test hesabı
 (3, 'VADESIZ_TL',    'TRY', 'TR340006200011112222330005', 85000.00);
+
+-- Tüm Müşterilere (Eğer hesabı yoksa) 10.000 TL'lik TR IBAN tanımlayan otomatik fonksiyon
+DO $$ 
+DECLARE 
+    customer_record RECORD;
+    random_acc VARCHAR;
+    random_iban VARCHAR;
+BEGIN 
+    FOR customer_record IN SELECT id FROM users WHERE role_code = 'CUSTOMER' LOOP
+        IF NOT EXISTS (SELECT 1 FROM accounts WHERE user_id = customer_record.id AND currency = 'TRY') THEN
+            random_acc := '100' || floor(random() * 89999999 + 10000000)::text;
+            random_iban := 'TR' || floor(random() * 89 + 10)::text || '000610' || floor(random() * 89999999 + 10000000)::text || floor(random() * 8999999 + 1000000)::text;
+            
+            INSERT INTO accounts (user_id, account_type, currency, account_number, iban, balance, is_active, created_at)
+            VALUES (customer_record.id, 'VADESIZ_TL', 'TRY', random_acc, random_iban, 10000.00, true, NOW());
+        END IF;
+    END LOOP; 
+END $$;
 
 -- =====================================================
 -- 3. TRANSFER LİMİTLERİ VE KOMİSYONLAR
