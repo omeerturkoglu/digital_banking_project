@@ -1,16 +1,53 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [BaseChartDirective], // HTML'de grafikleri kullanabilmek için import ettik
+  imports: [BaseChartDirective, CommonModule], 
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss' // Sende .css ise burayı .css yapmayı unutma
+  styleUrl: './dashboard.scss' 
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
   
+  totalBalance: number = 0;
+  totalIncome: number = 0;
+  totalExpense: number = 0;
+
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+
+  ngOnInit() {
+    this.fetchMyWallets();
+  }
+
+  fetchMyWallets() {
+    const token = localStorage.getItem('nova_token');
+    if (!token) return;
+
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+    this.http.get<any[]>('http://localhost:5000/api/v1/Accounts/my-wallets', { headers }).subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          this.totalBalance = data.reduce((sum, acc) => sum + acc.balance, 0);
+        } else {
+          this.totalBalance = 0;
+        }
+
+        // Mock grafikleri sıfırla ki gerçekçi olsun (ileride API'ye bağlanacak)
+        this.lineChartData.datasets[0].data = [0, 0, 0, 0, 0, 0];
+        this.lineChartData.datasets[1].data = [0, 0, 0, 0, 0, 0];
+        this.doughnutChartData.datasets[0].data = [0, 0, 0, 0, 0];
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Bakiye çekilirken hata:', err)
+    });
+  }
+
   // 1. Çizgi Grafik Ayarları (Gelir/Gider)
   public lineChartType: ChartType = 'line';
   public lineChartData: ChartData<'line'> = {

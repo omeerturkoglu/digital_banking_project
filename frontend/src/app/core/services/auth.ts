@@ -1,58 +1,98 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  // Mevcut giriş yapmış kullanıcıyı tutacağız
   currentUser: any = null;
+  private apiUrl = 'http://localhost:5000/api/v1/Auth';
 
-  constructor(private router: Router) {
-    // Sayfa yenilendiğinde LocalStorage'dan kullanıcıyı geri yükle
+  constructor(private router: Router, private http: HttpClient) {
     const savedUser = localStorage.getItem('nova_user');
     if (savedUser) {
       this.currentUser = JSON.parse(savedUser);
     }
   }
 
-  // Giriş Yapma Simülasyonu
-  login(role: string, tckn: string) {
-    // Seçilen role göre kullanıcı profili oluşturuyoruz
-    let userProfile = {};
+  login(role: string, tckn: string, password?: string) {
+    if (role === 'Müşteri (Kişisel Finans)') {
+      return this.http.post<any>(`${this.apiUrl}/login`, { tckn, password }).pipe(
+        tap(response => {
+          this.handleLoginSuccess(response.token, tckn, role, 'CUSTOMER');
+        })
+      );
+    } else {
+      // Diğer roller için şimdilik mock devam edebilir veya backend'e bağlanabilir
+      let roleCode = 'CUSTOMER';
+      if (role === 'Sistem Yöneticisi (Admin)') roleCode = 'ADMIN';
+      else if (role === 'Şube Müdürü') roleCode = 'MANAGER';
+      else if (role === 'Gişe Memuru') roleCode = 'TELLER';
+      
+      return this.http.post<any>(`${this.apiUrl}/login`, { tckn, password }).pipe(
+        tap(response => {
+          this.handleLoginSuccess(response.token, tckn, role, roleCode);
+        })
+      );
+    }
+  }
 
-    switch(role) {
-      case 'Müşteri (Kişisel Finans)':
-        userProfile = { name: 'S. Koray Ölmez', role: 'Müşteri', roleCode: 'CUSTOMER', initials: 'SK' };
-        break;
-      case 'Sistem Yöneticisi (Admin)':
-        userProfile = { name: 'İbrahim Emir Çınkır', role: 'Sistem Yöneticisi', roleCode: 'ADMIN', initials: 'İE' };
-        break;
-      case 'Şube Müdürü':
-        userProfile = { name: 'Ömer Türkoğlu', role: 'Şube Müdürü', roleCode: 'MANAGER', initials: 'ÖT' };
-        break;
-      case 'Gişe Memuru':
-        userProfile = { name: 'Gişe Personeli', role: 'Operasyon', roleCode: 'TELLER', initials: 'GP' };
-        break;
+  register(userData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, userData);
+  }
+
+  private handleLoginSuccess(token: string, tckn: string, roleName: string, roleCode: string) {
+    let fullName = 'Kullanıcı';
+    try {
+      // JWT token'ın payload kısmını çöz (Base64Url Decode)
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      const payload = JSON.parse(jsonPayload);
+      
+      // .NET ClaimTypes.Name genellikle "unique_name" veya "name" olarak serialize edilir
+      fullName = payload.unique_name || payload.name || 'Kullanıcı';
+    } catch (e) {
+      console.error('Token decode edilemedi', e);
     }
 
-    // Kullanıcıyı sisteme ve tarayıcı hafızasına kaydet
+    // Formatlama: İsmin İlk Harfleri Büyük, Soyisim TAMAMEN BÜYÜK
+    let formattedName = fullName;
+    let initials = 'U';
+
+    if (fullName && fullName !== 'Kullanıcı') {
+      const parts = fullName.trim().split(/\s+/);
+      if (parts.length > 1) {
+        const lastName = parts.pop()?.toUpperCase() || '';
+        const firstNames = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
+        
+        formattedName = `${firstNames} ${lastName}`;
+        initials = (firstNames.charAt(0) + lastName.charAt(0)).toUpperCase();
+      } else {
+        formattedName = fullName.charAt(0).toUpperCase() + fullName.slice(1).toLowerCase();
+        initials = formattedName.substring(0, 2).toUpperCase();
+      }
+    }
+
+    const userProfile = { 
+      name: formattedName, 
+      role: roleName, 
+      roleCode: roleCode, 
+      initials: initials 
+    };
+    
     this.currentUser = userProfile;
     localStorage.setItem('nova_user', JSON.stringify(userProfile));
-    
-    // Geçici bir Token uydurup kaydedelim (İleride Emir'in API'sinden gelecek)
-    localStorage.setItem('nova_token', 'eyJhbGciOiJIUzI1NiIsInR...');
+    localStorage.setItem('nova_token', token);
 
-    // Rolüne göre ana sayfaya yönlendir
-    if (this.currentUser.roleCode === 'ADMIN') {
-      this.router.navigate(['/sys-logs']);
-    } else if (this.currentUser.roleCode === 'MANAGER') {
-      this.router.navigate(['/approvals']);
-    } else if (this.currentUser.roleCode === 'TELLER') {
-      this.router.navigate(['/onboarding']);
-    } else {
-      this.router.navigate(['/dashboard']);
-    }
+    if (roleCode === 'ADMIN') this.router.navigate(['/sys-logs']);
+    else if (roleCode === 'MANAGER') this.router.navigate(['/approvals']);
+    else if (roleCode === 'TELLER') this.router.navigate(['/onboarding']);
+    else this.router.navigate(['/dashboard']);
   }
 
   // Çıkış Yapma

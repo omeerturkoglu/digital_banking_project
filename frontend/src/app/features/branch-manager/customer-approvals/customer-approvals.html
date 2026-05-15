@@ -1,0 +1,54 @@
+<div class="space-y-6">
+  <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+    <div>
+      <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+        <div class="p-2 bg-emerald-500/20 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </div>
+        Müşteri Onay İşlemleri
+      </h2>
+      <p class="text-gray-400 text-sm mt-1">Onay bekleyen yeni müşteri kayıtlarını inceleyin ve onaylayın</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-gray-400">Yükleniyor...</div>
+
+  <div *ngIf="!loading && pendingUsers.length === 0" class="bg-white/5 border border-gray-800 p-8 rounded-xl text-center">
+    <p class="text-gray-400">Şu anda onay bekleyen yeni müşteri kaydı bulunmamaktadır.</p>
+  </div>
+
+  <div *ngIf="!loading && pendingUsers.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let user of pendingUsers" class="bg-[#0a0f1c] border border-gray-800 rounded-xl overflow-hidden hover:border-emerald-500/50 transition-colors shadow-lg">
+      <div class="p-5 border-b border-gray-800">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-white">{{user.firstName}} {{user.lastName}}</h3>
+            <p class="text-sm text-gray-500">TC: {{user.tckn}}</p>
+          </div>
+          <span class="px-2 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded">BEKLİYOR</span>
+        </div>
+        
+        <div class="space-y-2 mt-4 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Email:</span>
+            <span class="text-gray-300">{{user.email}}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Telefon:</span>
+            <span class="text-gray-300">{{user.phone}}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Kayıt Tarihi:</span>
+            <span class="text-gray-300">{{user.createdAt | date:'short'}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 bg-gray-900/50">
+        <button (click)="approveUser(user.id)" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors flex justify-center items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+          Müşteriyi Onayla
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

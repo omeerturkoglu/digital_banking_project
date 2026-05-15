@@ -1,0 +1,70 @@
+<div class="min-h-screen bg-brand-dark flex items-center justify-center p-4">
+  
+  <div class="max-w-md w-full bg-brand-light border border-gray-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden mt-10 mb-10">
+    
+    <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand-primary/20 blur-3xl rounded-full pointer-events-none"></div>
+
+    <div class="flex items-center justify-center gap-3 mb-8 relative z-10">
+      <div class="w-12 h-12 rounded-xl bg-brand-primary flex items-center justify-center shadow-lg shadow-brand-primary/20">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <span class="text-3xl font-bold text-white tracking-wide">NOVA<span class="text-brand-primary">FINANS</span></span>
+    </div>
+
+    <h2 class="text-2xl font-bold text-white text-center mb-2">Aramıza Katılın</h2>
+    <p class="text-gray-400 text-center text-sm mb-6">Müşteri olarak yeni bir hesap oluşturun.</p>
+
+    <div *ngIf="errorMessage" class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm text-center">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="successMessage" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl mb-6 text-sm text-center font-semibold">
+      {{ successMessage }}
+    </div>
+
+    <div class="space-y-4">
+      
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">T.C. Kimlik Numarası *</label>
+        <input type="text" [(ngModel)]="user.tckn" name="tckn" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white font-mono focus:outline-none focus:border-brand-primary transition-colors" placeholder="11 Haneli T.C. Kimlik No">
+      </div>
+
+      <div class="flex gap-4">
+        <div class="flex-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Ad *</label>
+          <input type="text" [(ngModel)]="user.firstName" name="firstName" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="Adınız">
+        </div>
+        <div class="flex-1">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Soyad *</label>
+          <input type="text" [(ngModel)]="user.lastName" name="lastName" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="Soyadınız">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">E-Posta</label>
+        <input type="email" [(ngModel)]="user.email" name="email" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="ornek@email.com">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Telefon</label>
+        <input type="text" [(ngModel)]="user.phone" name="phone" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="05XX XXX XX XX">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Dijital Şifre *</label>
+        <input type="password" [(ngModel)]="user.password" name="password" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-primary transition-colors" placeholder="Güçlü bir şifre belirleyin">
+      </div>
+
+      <button (click)="onRegister()" [disabled]="isLoading" class="w-full mt-4 bg-brand-primary hover:bg-emerald-400 text-brand-dark font-extrabold py-4 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] flex justify-center items-center gap-2 disabled:opacity-50">
+        <span>{{ isLoading ? 'Kayıt Olunuyor...' : 'Kayıt Ol' }}</span>
+      </button>
+
+      <div class="text-center mt-4">
+        <p class="text-gray-400 text-sm">Zaten hesabınız var mı? <a routerLink="/login" class="text-brand-primary font-bold hover:text-emerald-400 transition-colors cursor-pointer">Giriş Yap</a></p>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-cash-operations',
@@ -18,6 +19,9 @@ export class CashOperations {
 
   isProcessing: boolean = false;
   successMessage: string | null = null;
+  errorMessage: string | null = null;
+
+  constructor(private http: HttpClient) {}
 
   setTab(tab: 'deposit' | 'withdraw') {
     this.activeTab = tab;
@@ -29,18 +33,32 @@ export class CashOperations {
 
     this.isProcessing = true;
     this.successMessage = null;
+    this.errorMessage = null;
 
-    // Simulating API call
-    setTimeout(() => {
-      this.isProcessing = false;
-      this.successMessage = this.activeTab === 'deposit' 
-        ? 'Nakit yatırma işlemi başarıyla tamamlandı.' 
-        : 'Nakit çekme işlemi başarıyla tamamlandı.';
-      
-      // Reset form
-      this.accountNo = '';
-      this.amount = null;
-      this.description = '';
-    }, 1500);
+    const token = localStorage.getItem('nova_token');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+    const endpoint = this.activeTab === 'deposit' ? 'deposit' : 'withdraw';
+    const requestBody = {
+      iban: this.accountNo,
+      amount: this.amount,
+      description: this.description
+    };
+
+    this.http.post(`http://127.0.0.1:5000/api/v1/Teller/${endpoint}`, requestBody, { headers }).subscribe({
+      next: (res: any) => {
+        this.isProcessing = false;
+        this.successMessage = res.message;
+        
+        // Reset form
+        this.accountNo = '';
+        this.amount = null;
+        this.description = '';
+      },
+      error: (err) => {
+        this.isProcessing = false;
+        this.errorMessage = err.error?.message || 'İşlem gerçekleştirilemedi.';
+      }
+    });
   }
 }

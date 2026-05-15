@@ -33,7 +33,7 @@
             <p class="text-white font-bold mb-1">{{acc.name}}</p>
             <p class="text-xs text-gray-500 font-mono mb-3">{{acc.iban}}</p>
             <p class="text-xl font-extrabold" [class.text-brand-primary]="selectedAccount.id === acc.id" [class.text-gray-300]="selectedAccount.id !== acc.id">
-              {{acc.balance | number}} <span class="text-sm">{{acc.currency}}</span>
+              {{acc.balance | number}} <span class="text-sm">{{acc.currencySymbol}}</span>
             </p>
           </div>
         </div>
@@ -47,11 +47,11 @@
             <label class="block text-xs font-bold text-gray-400 uppercase mb-2">İşlem Tipi</label>
             <div class="flex gap-4">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="transferType" [(ngModel)]="transferType" value="havale" class="text-brand-primary focus:ring-brand-primary bg-brand-dark border-gray-700">
+                <input type="radio" name="transferType" [(ngModel)]="transferType" value="HAVALE" class="text-brand-primary focus:ring-brand-primary bg-brand-dark border-gray-700">
                 <span class="text-white text-sm">Havale (Nova İçi)</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="transferType" [(ngModel)]="transferType" value="eft" class="text-brand-primary focus:ring-brand-primary bg-brand-dark border-gray-700">
+                <input type="radio" name="transferType" [(ngModel)]="transferType" value="EFT" class="text-brand-primary focus:ring-brand-primary bg-brand-dark border-gray-700">
                 <span class="text-white text-sm">EFT (Başka Banka)</span>
               </label>
             </div>
@@ -66,10 +66,10 @@
           </div>
 
           <div class="col-span-1 md:col-span-2">
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Tutar ({{selectedAccount.currency}})</label>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Tutar ({{selectedAccount?.currencySymbol}})</label>
             <div class="relative">
               <input type="number" [(ngModel)]="amount" class="w-full bg-brand-dark border border-gray-700 rounded-xl px-4 py-3 text-white text-2xl font-bold focus:outline-none focus:border-brand-primary transition-colors text-right" placeholder="0.00">
-              <span class="absolute inset-y-0 left-4 flex items-center text-gray-500 font-bold text-lg">{{selectedAccount.currency}}</span>
+              <span class="absolute inset-y-0 left-4 flex items-center text-gray-500 font-bold text-lg">{{selectedAccount?.currencySymbol}}</span>
             </div>
           </div>
         </div>
@@ -97,17 +97,17 @@
           <div class="border-t border-gray-700/50 my-4 pt-4 space-y-2">
             <div class="flex justify-between items-center">
               <span class="text-gray-400">Gönderilecek:</span>
-              <span class="text-white">{{ (amount || 0) | number:'1.2-2' }} {{selectedAccount.currency}}</span>
+              <span class="text-white">{{ (amount || 0) | number:'1.2-2' }} {{selectedAccount?.currencySymbol}}</span>
             </div>
             <div class="flex justify-between items-center">
               <span class="text-gray-400">İşlem Ücreti:</span>
-              <span class="text-brand-accent">{{ transactionFee | number:'1.2-2' }} {{selectedAccount.currency}}</span>
+              <span class="text-brand-accent">{{ transactionFee | number:'1.2-2' }} {{selectedAccount?.currencySymbol}}</span>
             </div>
           </div>
 
           <div class="border-t border-gray-600 pt-4 mt-4 flex justify-between items-end">
             <span class="text-gray-300 font-bold">Toplam Çıkış:</span>
-            <span class="text-2xl font-extrabold text-brand-primary">{{ totalAmount | number:'1.2-2' }} <span class="text-sm">{{selectedAccount.currency}}</span></span>
+            <span class="text-2xl font-extrabold text-brand-primary">{{ totalAmount | number:'1.2-2' }} <span class="text-sm">{{selectedAccount?.currencySymbol}}</span></span>
           </div>
         </div>
 

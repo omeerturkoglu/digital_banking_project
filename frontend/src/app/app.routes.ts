@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard'; // <-- TİRE İŞARETİ İLE DÜZELTİLDİ
 
+import { Register } from './features/auth/register/register';
+import { RouterModule } from '@angular/router';
+
 // Bileşenler
 import { Login } from './features/auth/login/login';
 import { Dashboard } from './features/dashboard/dashboard';
@@ -10,6 +13,7 @@ import { CurrencyExchange } from './features/customer/currency-exchange/currency
 import { Reports } from './features/customer/reports/reports';
 import { TransferApprovals } from './features/branch-manager/transfer-approvals/transfer-approvals';
 import { CustomerSummary } from './features/branch-manager/customer-summary/customer-summary';
+import { CustomerApprovals } from './features/branch-manager/customer-approvals/customer-approvals';
 import { CustomerOnboarding } from './features/teller/customer-onboarding/customer-onboarding';
 import { CashOperations } from './features/teller/cash-operations/cash-operations';
 import { SysLogs } from './features/admin/sys-logs/sys-logs';
@@ -19,6 +23,7 @@ import { ForgotPassword } from './features/auth/forgot-password/forgot-password'
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
+  { path: 'register', component: Register },
   { path: 'forgot-password', component: ForgotPassword },
 
   // MÜŞTERİ ROTALARI
@@ -63,6 +68,12 @@ export const routes: Routes = [
   { 
     path: 'customer-summary', 
     component: CustomerSummary, 
+    canActivate: [authGuard], 
+    data: { roles: ['MANAGER'] }
+  },
+  { 
+    path: 'customer-approvals', 
+    component: CustomerApprovals, 
     canActivate: [authGuard], 
     data: { roles: ['MANAGER'] }
   },

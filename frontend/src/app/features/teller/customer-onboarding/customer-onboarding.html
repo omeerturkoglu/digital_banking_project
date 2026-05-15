@@ -17,6 +17,11 @@
     <p class="font-semibold">{{successMessage}}</p>
   </div>
 
+  <div *ngIf="errorMessage" class="bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl flex items-center gap-3">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <p class="font-semibold">{{errorMessage}}</p>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
     
     <div class="lg:col-span-2 bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">

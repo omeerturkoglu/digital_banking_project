@@ -14,11 +14,28 @@ import { RouterModule } from '@angular/router';
 })
 export class Login {
   selectedRole: string = 'Müşteri (Kişisel Finans)'; // Varsayılan seçim
+  tcNo: string = '';
+  password: string = '';
+
+  errorMessage: string = '';
 
   constructor(private authService: AuthService) {}
 
   onLogin() {
-    // Servis üzerinden giriş işlemini başlatıyoruz
-    this.authService.login(this.selectedRole, '12345678901');
+    this.errorMessage = '';
+    if (!this.tcNo || !this.password) {
+      this.errorMessage = 'Lütfen T.C. Kimlik numaranızı ve şifrenizi girin.';
+      return;
+    }
+
+    this.authService.login(this.selectedRole, this.tcNo, this.password).subscribe({
+      next: () => {
+        // Yönlendirme serviste yapılıyor
+      },
+      error: (err) => {
+        this.errorMessage = 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.';
+        console.error(err);
+      }
+    });
   }
 }

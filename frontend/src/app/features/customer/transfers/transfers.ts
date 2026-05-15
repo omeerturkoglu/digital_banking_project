@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Input değerlerini okumak için
+import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-transfers',
@@ -9,23 +10,50 @@ import { FormsModule } from '@angular/forms'; // Input değerlerini okumak için
   templateUrl: './transfers.html',
   styleUrl: './transfers.scss'
 })
-export class Transfers {
-  // Simüle edilmiş müşteri hesapları
-  accounts = [
-    { id: 1, name: 'Vadesiz Maaş', balance: 142500.00, currency: '₺', iban: 'TR12 0006 1111 2222 33', type: 'TL' },
-    { id: 2, name: 'Birikim Hesabı', balance: 25000.00, currency: '₺', iban: 'TR12 0006 4444 5555 66', type: 'TL' },
-    { id: 3, name: 'Döviz Yatırım', balance: 4500.00, currency: '$', iban: 'TR12 0006 7777 8888 99', type: 'USD' }
-  ];
-
-  selectedAccount = this.accounts[0];
+export class Transfers implements OnInit {
+  accounts: any[] = [];
+  selectedAccount: any = null;
   toIban: string = '';
   amount: number | null = null;
-  transferType: string = 'havale'; // 'havale' veya 'eft'
+  transferType: string = 'HAVALE'; // 'HAVALE' veya 'EFT'
   isProcessing: boolean = false;
 
-  // Transfer tipine göre dinamik komisyon hesaplama (Rapordaki Yönetici kuralı simülasyonu)
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+
+  ngOnInit() {
+    this.fetchAccounts();
+  }
+
+  fetchAccounts() {
+    const token = localStorage.getItem('nova_token');
+    if (!token) return;
+
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+    this.http.get<any[]>('http://localhost:5000/api/v1/Accounts/my-wallets', { headers }).subscribe({
+      next: (data) => {
+        this.accounts = (data || []).map(acc => {
+           let symbol = '₺';
+           if (acc.currency === 'USD') symbol = '$';
+           else if (acc.currency === 'EUR') symbol = '€';
+           return { ...acc, currencySymbol: symbol, name: acc.accountType.replace('_', ' ') };
+        });
+        
+        if (this.accounts.length > 0 && !this.selectedAccount) {
+          this.selectedAccount = this.accounts[0];
+        } else if (this.selectedAccount) {
+          // Bakiye güncellendiğinde selectedAccount'u da güncelle
+          this.selectedAccount = this.accounts.find(a => a.id === this.selectedAccount.id) || this.accounts[0];
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Hesaplar çekilemedi:', err)
+    });
+  }
+
+  // Transfer tipine göre dinamik komisyon hesaplama
   get transactionFee(): number {
-    return this.transferType === 'eft' ? 12.50 : 0.00;
+    return this.transferType === 'EFT' ? 12.50 : 0.00;
   }
 
   // Toplam çıkış
@@ -35,6 +63,10 @@ export class Transfers {
 
   // Transferi Başlat
   executeTransfer() {
+    if (!this.selectedAccount) {
+      alert('Lütfen geçerli bir hesap seçiniz.');
+      return;
+    }
     if (!this.toIban || !this.amount || this.amount <= 0) {
       alert('Lütfen geçerli bir IBAN ve tutar giriniz.');
       return;
@@ -47,18 +79,37 @@ export class Transfers {
 
     this.isProcessing = true;
 
-    // API İstek Simülasyonu
-    setTimeout(() => {
-      this.isProcessing = false;
-      
-      // Bakiye düşme simülasyonu
-      this.selectedAccount.balance -= this.totalAmount;
-      
-      alert(`BAŞARILI: ${this.amount} ${this.selectedAccount.currency} transfer edildi.\nDekont numarası: TXN-${Math.floor(Math.random() * 1000000)}`);
-      
-      // Formu temizle
-      this.toIban = '';
-      this.amount = null;
-    }, 1200);
+    // Frontend IBAN kutusunda TR span'ı var, kullanıcı sadece rakamları giriyor
+    // Dolayısıyla backend'e gönderirken başına TR ekliyoruz ve boşlukları siliyoruz
+    let formattedIban = this.toIban.replace(/\s+/g, '');
+    if (!formattedIban.startsWith('TR')) {
+      formattedIban = 'TR' + formattedIban;
+    }
+
+    const payload = {
+      fromAccountId: this.selectedAccount.id,
+      toIban: formattedIban,
+      amount: this.amount,
+      transactionType: this.transferType,
+      description: 'Transfer İşlemi'
+    };
+
+    const token = localStorage.getItem('nova_token');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+    this.http.post('http://localhost:5000/api/v1/Transfers/new', payload, { headers }).subscribe({
+      next: (res: any) => {
+        this.isProcessing = false;
+        alert(res.message || 'İşlem alındı.');
+        this.fetchAccounts(); // Bakiyeyi güncellemek için
+        this.toIban = '';
+        this.amount = null;
+      },
+      error: (err) => {
+        this.isProcessing = false;
+        alert('HATA: ' + (err.error?.message || err.message || 'Transfer gerçekleştirilemedi.'));
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
