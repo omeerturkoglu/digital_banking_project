@@ -26,13 +26,23 @@ namespace Backend.Services
             if (fromAccount.Balance < requestDto.Amount)
                 throw new Exception("Yetersiz bakiye.");
 
+            // Eğer ToIban girildiyse, sistemde o IBAN'a ait hesap var mı kontrol et
+            if (!string.IsNullOrEmpty(requestDto.ToIban))
+            {
+                var targetAccount = await _context.Accounts.FirstOrDefaultAsync(a => a.Iban == requestDto.ToIban);
+                if (targetAccount != null)
+                {
+                    requestDto.ToAccountId = targetAccount.Id;
+                }
+            }
+
             // Calculate commission fee (Simplified logic, ideally should query CommissionRules table)
             decimal fee = requestDto.TransactionType == "EFT" ? 10.0m : 0.0m; // Example fixed fee
 
             if (fromAccount.Balance < requestDto.Amount + fee)
                 throw new Exception("Bakiye komisyon tutarını karşılamıyor.");
 
-            bool requiresApproval = requestDto.Amount > 100000; // Limit onayı
+            bool requiresApproval = requestDto.Amount >= 5000; // Limit onayı
             string status = requiresApproval ? "PENDING" : "COMPLETED";
 
             var transaction = new Transaction
@@ -53,16 +63,19 @@ namespace Backend.Services
                 CompletedAt = requiresApproval ? null : DateTime.UtcNow
             };
 
-            // Deduct balance immediately even if pending, to reserve funds
-            fromAccount.Balance -= (requestDto.Amount + fee);
-
-            // If completed, add to recipient if internal transfer
-            if (!requiresApproval && requestDto.ToAccountId.HasValue)
+            // Deduct balance only if no approval required (per user request)
+            if (!requiresApproval)
             {
-                var toAccount = await _context.Accounts.FindAsync(requestDto.ToAccountId);
-                if (toAccount != null)
+                fromAccount.Balance -= (requestDto.Amount + fee);
+
+                // Add to recipient if internal
+                if (requestDto.ToAccountId.HasValue)
                 {
-                    toAccount.Balance += requestDto.Amount;
+                    var toAccount = await _context.Accounts.FindAsync(requestDto.ToAccountId);
+                    if (toAccount != null)
+                    {
+                        toAccount.Balance += requestDto.Amount;
+                    }
                 }
             }
 
@@ -81,6 +94,16 @@ namespace Backend.Services
             txn.Status = "COMPLETED";
             txn.CompletedAt = DateTime.UtcNow;
             txn.ApprovedById = managerId;
+
+            // Sender hesabını bulup bakiyeyi şimdi düşüyoruz
+            if (txn.FromAccountId.HasValue)
+            {
+                var fromAccount = await _context.Accounts.FindAsync(txn.FromAccountId);
+                if (fromAccount != null)
+                {
+                    fromAccount.Balance -= (txn.Amount + txn.TransactionFee);
+                }
+            }
 
             // Add to recipient if internal
             if (txn.ToAccountId.HasValue)
@@ -105,16 +128,6 @@ namespace Backend.Services
             txn.Status = "REJECTED";
             txn.ApprovedById = managerId;
             txn.CompletedAt = DateTime.UtcNow;
-
-            // Refund the sender
-            if (txn.FromAccountId.HasValue)
-            {
-                var fromAccount = await _context.Accounts.FindAsync(txn.FromAccountId);
-                if (fromAccount != null)
-                {
-                    fromAccount.Balance += (txn.Amount + txn.TransactionFee);
-                }
-            }
 
             await _context.SaveChangesAsync();
             return true;

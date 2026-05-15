@@ -10,10 +10,12 @@ namespace Backend.Controllers
     public class ExchangeController : ControllerBase
     {
         private readonly IRedisCacheService _redisCacheService;
+        private readonly IExchangeService _exchangeService;
 
-        public ExchangeController(IRedisCacheService redisCacheService)
+        public ExchangeController(IRedisCacheService redisCacheService, IExchangeService exchangeService)
         {
             _redisCacheService = redisCacheService;
+            _exchangeService = exchangeService;
         }
 
         [HttpGet("live-rates")]
@@ -25,6 +27,25 @@ namespace Backend.Controllers
                 return NotFound(new { Message = "Kurlar henüz güncellenmedi." });
             }
             return Ok(rates);
+        }
+
+        [HttpPost("execute")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> ExecuteExchange([FromBody] Backend.DTOs.Exchange.ExchangeRequestDto request)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdClaim, out int userId)) return Unauthorized();
+
+                var result = await _exchangeService.ExecuteExchangeAsync(userId, request);
+                return Ok(new { Message = "İşlem başarıyla tamamlandı.", Success = true });
+            }
+            catch (System.Exception ex)
+            {
+                var fullMessage = ex.InnerException != null ? $"{ex.Message} -> {ex.InnerException.Message}" : ex.Message;
+                return BadRequest(new { Message = fullMessage, Success = false });
+            }
         }
     }
 }

@@ -29,10 +29,12 @@ builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransferService, TransferService>();
+builder.Services.AddScoped<IExchangeService, ExchangeService>();
+builder.Services.AddScoped<ITellerService, TellerService>();
 builder.Services.AddScoped<IPfmService, PfmService>();
 
 // 6. Background Service
-builder.Services.AddHostedService<ExchangeRateUpdaterService>();
+// builder.Services.AddHostedService<ExchangeRateUpdaterService>();
 
 // 7. JWT Authentication Setup
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -65,7 +67,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins("http://localhost:4200", "http://127.0.0.1:4200")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -81,7 +83,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Dev ortamında takılmaları önlemek için kapattık
 
 app.UseCors("AllowFrontend");
 
@@ -90,4 +92,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+Console.OutputEncoding = System.Text.Encoding.UTF8;
 app.Run();
