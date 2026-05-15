@@ -2,7 +2,8 @@ namespace Backend.DTOs.Auth
 {
     public class ResetPasswordDto
     {
-        public string Token { get; set; } = null!;
+        public string Tckn { get; set; } = null!;
+        public string CurrentPassword { get; set; } = null!;
         public string NewPassword { get; set; } = null!;
     }
 }

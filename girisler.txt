@@ -1,0 +1,30 @@
+S. Koray Ölmez (Müşteri):
+TCKN: 12345678901
+Şifre: password123
+
+İbrahim Emir Çınkır (Sistem Yöneticisi):
+TCKN: 98765432101
+Şifre: password123
+
+Ömer Türkoğlu (Şube Müdürü):
+TCKN: 11223344556
+Şifre: password123
+
+Ayşe Yıldız (Gişe Memuru):
+TCKN: 55443322110
+Şifre: password123
+
+Kullanıcı (İmparator Terim)
+TCKN : 09876543211
+IBAN : TR21000610212480417490801
+Şifre : 123456
+
+Kullanıcı (Lebron James)
+TCKN : 09876543210
+IBAN : TR96000610446858624033506
+Şifre : 123456
+
+Kullanıcı (Deneme Kaydi)
+TCKN : 12312312356
+IBAN : TR66000610185466941989882
+Şifre : 123456

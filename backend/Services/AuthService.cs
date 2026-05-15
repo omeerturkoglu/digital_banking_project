@@ -105,23 +105,34 @@ namespace Backend.Services
 
         public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
         {
-            var tokenEntity = await _context.PasswordResetTokens
-                .Include(p => p.User)
-                .SingleOrDefaultAsync(p => p.Token == resetPasswordDto.Token && !p.IsUsed);
-
-            if (tokenEntity == null || tokenEntity.ExpiresAt < DateTime.UtcNow)
+            try 
             {
-                throw new Exception("Geçersiz veya süresi dolmuş token.");
+                var user = await _context.Users.SingleOrDefaultAsync(u => u.Tckn == resetPasswordDto.Tckn);
+                
+                if (user == null) throw new Exception("Gecersiz TCKN veya sifre.");
+
+                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(resetPasswordDto.CurrentPassword, user.PasswordHash);
+                if (!isPasswordValid) throw new Exception("Gecersiz TCKN veya sifre.");
+
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto.NewPassword);
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+                
+                // Konsolu zorla yazdır
+                Console.WriteLine("[DEBUG] VERITABANI KAYDI TAMAMLANDI. CEVAP HAZIRLANIYOR...");
+                Console.Out.Flush();
+
+                // Cevabın yola çıkması için çok kısa bir bekleme
+                await Task.Delay(200);
+                
+                return true;
             }
-
-            var user = tokenEntity.User;
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto.NewPassword);
-            user.UpdatedAt = DateTime.UtcNow;
-
-            tokenEntity.IsUsed = true;
-
-            await _context.SaveChangesAsync();
-            return true;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] {ex.Message}");
+                throw;
+            }
         }
 
         private string GenerateJwtToken(User user)

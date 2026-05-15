@@ -50,11 +50,14 @@ namespace Backend.Controllers
         {
             try
             {
+                Console.WriteLine($"[CONTROLLER] ResetPassword istegi alindi: TCKN={resetPasswordDto.Tckn}");
                 var result = await _authService.ResetPasswordAsync(resetPasswordDto);
-                return Ok(new { Message = "Şifre başarıyla güncellendi." });
+                Console.WriteLine("[CONTROLLER] Servis basariyla dondu, Ok() gonderiliyor.");
+                return Ok(new { Message = "Sifre basariyla guncellendi." });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[CONTROLLER-ERROR] {ex.Message}");
                 return BadRequest(new { Message = ex.Message });
             }
         }
