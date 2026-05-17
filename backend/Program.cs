@@ -34,7 +34,7 @@ builder.Services.AddScoped<ITellerService, TellerService>();
 builder.Services.AddScoped<IPfmService, PfmService>();
 
 // 6. Background Service
-// builder.Services.AddHostedService<ExchangeRateUpdaterService>();
+builder.Services.AddHostedService<ExchangeRateUpdaterService>();
 
 // 7. JWT Authentication Setup
 var jwtSettings = builder.Configuration.GetSection("Jwt");

@@ -35,6 +35,25 @@ namespace Backend.Services
             return accounts;
         }
 
+        public async Task<bool> CreateAccountAsync(int userId, string accountType, string currency)
+        {
+            var account = new Backend.Models.Account
+            {
+                UserId = userId,
+                AccountType = accountType,
+                Currency = currency,
+                AccountNumber = await GenerateAccountNumberAsync(),
+                Iban = await GenerateIbanAsync(currency),
+                Balance = 0,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Accounts.Add(account);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<string> GenerateAccountNumberAsync()
         {
             string newAccountNumber;

@@ -22,6 +22,7 @@ export class Login {
   constructor(private authService: AuthService) {}
 
   onLogin() {
+    console.log('[LOGIN] onLogin started', { tcNo: this.tcNo, role: this.selectedRole });
     this.errorMessage = '';
     if (!this.tcNo || !this.password) {
       this.errorMessage = 'Lütfen T.C. Kimlik numaranızı ve şifrenizi girin.';
@@ -29,12 +30,12 @@ export class Login {
     }
 
     this.authService.login(this.selectedRole, this.tcNo, this.password).subscribe({
-      next: () => {
-        // Yönlendirme serviste yapılıyor
+      next: (res) => {
+        console.log('[LOGIN] Login successful');
       },
       error: (err) => {
-        this.errorMessage = 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.';
-        console.error(err);
+        console.error('[LOGIN] Login failed:', err);
+        this.errorMessage = err.error?.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.';
       }
     });
   }

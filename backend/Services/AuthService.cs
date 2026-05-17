@@ -27,31 +27,40 @@ namespace Backend.Services
 
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
+            Console.WriteLine($"[AUTH-SERVICE] LoginAsync started for TCKN: {loginDto.Tckn}");
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Tckn == loginDto.Tckn);
             
             if (user == null)
             {
+                Console.WriteLine("[AUTH-SERVICE] Login failed: User not found.");
                 throw new Exception("Geçersiz TCKN veya şifre.");
             }
 
+            Console.WriteLine($"[AUTH-SERVICE] User found. Verifying password for {user.FirstName}...");
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
+            
             if (!isPasswordValid)
             {
+                Console.WriteLine("[AUTH-SERVICE] Login failed: Invalid password.");
                 throw new Exception("Geçersiz TCKN veya şifre.");
             }
 
             if (!user.IsActive)
             {
+                Console.WriteLine("[AUTH-SERVICE] Login failed: Account is not active.");
                 throw new Exception("Hesabınız henüz Sistem Yöneticisi tarafından onaylanmamıştır. Lütfen bekleyiniz.");
             }
 
+            Console.WriteLine("[AUTH-SERVICE] Login successful. Generating token...");
             return GenerateJwtToken(user);
         }
 
         public async Task<bool> RegisterAsync(RegisterDto registerDto)
         {
+            Console.WriteLine($"[AUTH-SERVICE] RegisterAsync started for TCKN: {registerDto.Tckn}");
             if (await _context.Users.AnyAsync(u => u.Tckn == registerDto.Tckn))
             {
+                Console.WriteLine("[AUTH-SERVICE] User already exists.");
                 throw new Exception("Bu TCKN ile kayıtlı bir kullanıcı zaten var.");
             }
 
@@ -63,14 +72,16 @@ namespace Backend.Services
                 Email = registerDto.Email,
                 Phone = registerDto.Phone,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-                RoleCode = "CUSTOMER", // Varsayılan rol
-                IsActive = false, // Yeni kayıtlar artık varsayılan olarak "Onay Bekliyor"
+                RoleCode = "CUSTOMER", 
+                IsActive = true, // TEST İÇİN: Şimdilik direkt aktif ediyoruz ki giriş yapabilesiniz
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
+            Console.WriteLine("[AUTH-SERVICE] Adding user to DB...");
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+            Console.WriteLine($"[AUTH-SERVICE] User saved. ID: {user.Id}");
 
             // Otomatik IBAN ve Bakiye Tanımlaması
             var random = new Random();
@@ -86,6 +97,7 @@ namespace Backend.Services
                 CreatedAt = DateTime.UtcNow
             };
             
+            Console.WriteLine($"[AUTH-SERVICE] Creating account: {account.Iban}");
             _context.Accounts.Add(account);
 
             var auditLog = new AuditLog
@@ -98,7 +110,9 @@ namespace Backend.Services
             };
             
             _context.AuditLogs.Add(auditLog);
+            Console.WriteLine("[AUTH-SERVICE] Saving account and audit log...");
             await _context.SaveChangesAsync();
+            Console.WriteLine("[AUTH-SERVICE] Registration complete.");
 
             return true;
         }

@@ -41,7 +41,8 @@ namespace Backend.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                var errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                return BadRequest(new { Message = errorMsg });
             }
         }
 

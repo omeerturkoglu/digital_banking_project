@@ -29,5 +29,18 @@ namespace Backend.Controllers
             }
             return Unauthorized();
         }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateAccount([FromBody] Backend.DTOs.Accounts.CreateAccountDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                var result = await _accountService.CreateAccountAsync(userId, dto.AccountType, dto.Currency);
+                if (result) return Ok(new { Message = "Yeni hesap başarıyla oluşturuldu." });
+                return BadRequest(new { Message = "Hesap oluşturulurken bir hata oluştu." });
+            }
+            return Unauthorized();
+        }
     }
 }

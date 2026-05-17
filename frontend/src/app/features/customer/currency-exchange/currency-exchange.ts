@@ -54,6 +54,9 @@ export class CurrencyExchange implements OnInit, OnDestroy {
           this.selectedCurrency = this.marketRates[0];
         }
         this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to fetch live rates:', err);
       }
     });
   }

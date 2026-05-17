@@ -37,6 +37,7 @@ export class Accounts implements OnInit {
           
           if (acc.currency === 'USD') { symbol = '$'; bg = 'from-blue-500/20 to-brand-dark'; typeDesc = 'Vadesiz Döviz (USD)'; }
           else if (acc.currency === 'EUR') { symbol = '€'; bg = 'from-indigo-500/20 to-brand-dark'; typeDesc = 'Vadesiz Döviz (EUR)'; }
+          else if (acc.currency === 'GBP') { symbol = '£'; bg = 'from-amber-500/20 to-brand-dark'; typeDesc = 'Vadesiz Döviz (GBP)'; }
           
           return {
             ...acc,
@@ -53,6 +54,26 @@ export class Accounts implements OnInit {
 
   // Yeni Hesap Oluşturma Fonksiyonu
   openNewAccount() {
-    alert("Yeni hesap açma özelliği Backend entegrasyonu tamamlandığında devreye girecektir.");
+    this.isCreating = true;
+    const token = localStorage.getItem('nova_token');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+    const payload = {
+      accountType: this.newAccountType === 'TL' ? 'VADESIZ_TL' : 'VADESIZ_DOVIZ',
+      currency: this.newAccountType === 'TL' ? 'TRY' : this.selectedCurrency
+    };
+
+    this.http.post('http://localhost:5000/api/v1/Accounts/create', payload, { headers }).subscribe({
+      next: (res: any) => {
+        this.isCreating = false;
+        alert(res.message);
+        this.fetchAccounts(); // Listeyi yenile
+      },
+      error: (err) => {
+        this.isCreating = false;
+        alert(err.error?.message || 'Hesap oluşturulurken bir hata oluştu.');
+        console.error(err);
+      }
+    });
   }
 }
