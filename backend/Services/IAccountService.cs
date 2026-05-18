@@ -7,6 +7,7 @@ namespace Backend.Services
     public interface IAccountService
     {
         Task<List<AccountResponseDto>> GetMyWalletsAsync(int userId);
+        Task<List<AccountTransactionDto>> GetMyTransactionsAsync(int userId);
         Task<bool> CreateAccountAsync(int userId, string accountType, string currency);
         Task<string> GenerateIbanAsync(string currency);
         Task<string> GenerateAccountNumberAsync();

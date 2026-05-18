@@ -1,107 +1,95 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartData, ChartType } from 'chart.js';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule, BaseChartDirective],
+  imports: [CommonModule],
   templateUrl: './reports.html',
   styleUrl: './reports.scss'
 })
-export class Reports {
-  // Pasta Grafik Tipi ve Verileri
-  public doughnutChartType: ChartType = 'doughnut';
-  public doughnutChartData: ChartData<'doughnut'> = {
-    labels: ['Market & Gıda', 'Faturalar', 'Eğlence', 'Ulaşım', 'Eğitim'],
-    datasets: [{
-      data: [4500, 2200, 3150, 1500, 1500],
-      backgroundColor: ['#10b981', '#f43f5e', '#3b82f6', '#f59e0b', '#8b5cf6'],
-      borderWidth: 0,
-      hoverOffset: 10
-    }]
-  };
+export class Reports implements OnInit {
+  transactions: any[] = [];
+  totalTransactions = 0;
+  pendingTransactions = 0;
+  completedTransactions = 0;
+  isLoading = false;
+  errorMessage = '';
 
-  // Modern Grafik Ayarları (Legend kapalı, İnce Halka, Şık Tooltip)
-  public doughnutChartOptions: any = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      // Çirkin varsayılan legend'ı kapattık (Yerine HTML'de kendimiz çizdik)
-      legend: { display: false }, 
-      // Üzerine gelince çıkan bilgi kutucuğunu (tooltip) şıklaştırır
-      tooltip: {
-        backgroundColor: '#1e293b',
-        titleColor: '#f8fafc',
-        bodyColor: '#cbd5e1',
-        borderColor: '#334155',
-        borderWidth: 1,
-        padding: 12,
-        boxPadding: 4,
-        usePointStyle: true
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+
+  ngOnInit() {
+    this.fetchTransactions();
+  }
+
+  fetchTransactions() {
+    const token = localStorage.getItem('nova_token');
+    if (!token) {
+      this.errorMessage = 'Oturum bulunamadi.';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    this.http.get<any[]>('http://localhost:5000/api/v1/Accounts/my-transactions', { headers }).subscribe({
+      next: (data) => {
+        const normalized = Array.isArray(data)
+          ? data
+          : Array.isArray((data as any)?.value)
+            ? (data as any).value
+            : [];
+
+        this.transactions = normalized;
+        this.totalTransactions = normalized.length;
+        this.pendingTransactions = normalized.filter((t: any) => t.status === 'PENDING').length;
+        this.completedTransactions = normalized.filter((t: any) => t.status === 'COMPLETED').length;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Hesap hareketleri yuklenemedi.';
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
-    },
-    cutout: '82%', // Halkanın içini daha çok boşaltıp zarif bir çizgi haline getirdik
-    layout: {
-      padding: 10 // Grafiğin etrafına nefes aldıracak boşluk
-    }
-  };
-
-  // Bütçe Hedefleri Verisi
-  budgets = [
-    { category: 'Market & Gıda', limit: 5000, spent: 4500, color: 'bg-emerald-500' },
-    { category: 'Eğlence', limit: 4000, spent: 3150, color: 'bg-blue-500' },
-    { category: 'Faturalar', limit: 2500, spent: 2200, color: 'bg-rose-500' }
-  ];
-
-  // Son İşlemler (Kategorize Edilecek Liste)
-  transactions = [
-    { id: 'TX-101', merchant: 'Migros A.Ş.', amount: 1250.50, date: '14 Mayıs', category: 'Market & Gıda' },
-    { id: 'TX-102', merchant: 'Netflix', amount: 229.99, date: '12 Mayıs', category: 'Eğlence' },
-    { id: 'TX-103', merchant: 'CK Boğaziçi Elektrik', amount: 845.00, date: '10 Mayıs', category: 'Faturalar' },
-    { id: 'TX-104', merchant: 'Belirsiz İşlem (POS)', amount: 450.00, date: '09 Mayıs', category: 'Kategorisiz' }
-  ];
-
-  // Bütçe Yüzde Hesaplayıcı
-  getPercentage(spent: number, limit: number): number {
-    return Math.min(Math.round((spent / limit) * 100), 100);
+    });
   }
 
-  // İşlem Kategorisi Güncelleme
-  updateCategory(tx: any, newCategory: string) {
-    tx.category = newCategory;
-    alert(`[Sistem Mesajı] ${tx.merchant} işlemi '${newCategory}' olarak güncellendi.`);
+  getDirectionLabel(direction: string): string {
+    if (direction === 'OUT') return 'Giden';
+    if (direction === 'IN') return 'Gelen';
+    if (direction === 'EXCHANGE') return 'Doviz';
+    if (direction === 'INTERNAL') return 'Ic Transfer';
+    return 'Bilgi';
   }
 
-  // Bütçe Formu Modal State ve Metotları
-  isBudgetModalOpen = false;
-  editingBudget: any = null;
-
-  openBudgetModal(budget?: any) {
-    if (budget) {
-      this.editingBudget = { ...budget };
-    } else {
-      this.editingBudget = { category: '', limit: 0, spent: 0, color: 'bg-emerald-500' };
-    }
-    this.isBudgetModalOpen = true;
+  getDirectionClass(direction: string): string {
+    if (direction === 'OUT') return 'bg-rose-500/10 text-rose-300 border-rose-500/20';
+    if (direction === 'IN') return 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20';
+    if (direction === 'EXCHANGE') return 'bg-blue-500/10 text-blue-300 border-blue-500/20';
+    return 'bg-slate-500/10 text-slate-300 border-slate-500/20';
   }
 
-  closeBudgetModal() {
-    this.isBudgetModalOpen = false;
-    this.editingBudget = null;
+  getStatusClass(status: string): string {
+    if (status === 'COMPLETED') return 'text-emerald-300';
+    if (status === 'PENDING') return 'text-amber-300';
+    if (status === 'REJECTED') return 'text-rose-300';
+    return 'text-slate-300';
   }
 
-  saveBudget() {
-    if (!this.editingBudget.category || this.editingBudget.limit <= 0) return;
-    
-    const existingIndex = this.budgets.findIndex(b => b.category === this.editingBudget.category);
-    if (existingIndex !== -1) {
-      this.budgets[existingIndex].limit = this.editingBudget.limit;
-    } else {
-      this.budgets.push({ ...this.editingBudget });
-    }
-    this.closeBudgetModal();
+  formatAmount(tx: any): string {
+    const sign = tx.direction === 'OUT' ? '-' : tx.direction === 'IN' ? '+' : '';
+    return `${sign}${Number(tx.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${tx.currency}`;
+  }
+
+  formatFee(value: number): string {
+    return Number(value).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  formatDate(value: string): string {
+    return new Date(value).toLocaleString('tr-TR');
   }
 }

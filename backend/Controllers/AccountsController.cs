@@ -30,6 +30,18 @@ namespace Backend.Controllers
             return Unauthorized();
         }
 
+        [HttpGet("my-transactions")]
+        public async Task<IActionResult> GetMyTransactions()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                var transactions = await _accountService.GetMyTransactionsAsync(userId);
+                return Ok(transactions);
+            }
+            return Unauthorized();
+        }
+
         [HttpPost("create")]
         public async Task<IActionResult> CreateAccount([FromBody] Backend.DTOs.Accounts.CreateAccountDto dto)
         {

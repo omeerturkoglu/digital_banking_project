@@ -4,5 +4,6 @@ namespace Backend.DTOs.Auth
     {
         public string Tckn { get; set; } = null!;
         public string Password { get; set; } = null!;
+        public string? ExpectedRole { get; set; }
     }
 }

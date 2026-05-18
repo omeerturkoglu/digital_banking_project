@@ -51,6 +51,13 @@ namespace Backend.Services
                 throw new Exception("Hesabınız henüz Sistem Yöneticisi tarafından onaylanmamıştır. Lütfen bekleyiniz.");
             }
 
+            if (!string.IsNullOrWhiteSpace(loginDto.ExpectedRole) &&
+                !string.Equals(user.RoleCode, loginDto.ExpectedRole, StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("[AUTH-SERVICE] Login failed: Role mismatch.");
+                throw new Exception("Sectiginiz rol ile kullanici yetkisi eslesmiyor.");
+            }
+
             Console.WriteLine("[AUTH-SERVICE] Login successful. Generating token...");
             return GenerateJwtToken(user);
         }
