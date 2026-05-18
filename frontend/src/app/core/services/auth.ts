@@ -14,10 +14,8 @@ export class AuthService {
     this.restoreSessionFromToken();
   }
 
-  login(role: string, tckn: string, password?: string) {
-    const expectedRole = this.mapSelectedRoleToCode(role);
-
-    return this.http.post<any>(`${this.apiUrl}/login`, { tckn, password, expectedRole }).pipe(
+  login(tckn: string, password?: string) {
+    return this.http.post<any>(`${this.apiUrl}/login`, { tckn, password }).pipe(
       tap(response => {
         this.handleLoginSuccess(response.token);
       })
@@ -108,13 +106,6 @@ export class AuthService {
       console.error('Token decode edilemedi', e);
       return null;
     }
-  }
-
-  private mapSelectedRoleToCode(role: string): string {
-    if (role.includes('Admin')) return 'ADMIN';
-    if (role.includes('Müdürü') || role.includes('MÃ¼dÃ¼rÃ¼')) return 'MANAGER';
-    if (role.includes('Memuru')) return 'TELLER';
-    return 'CUSTOMER';
   }
 
   private mapRoleCodeToLabel(roleCode: string): string {
